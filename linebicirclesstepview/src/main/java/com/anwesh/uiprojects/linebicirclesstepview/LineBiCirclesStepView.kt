@@ -138,4 +138,49 @@ class LineBiCirclesStepView(ctx : Context) : View(ctx) {
             }
         }
     }
+
+    data class LBCSNode(var i : Int  = 0, val state : State = State()) {
+
+        private var next : LBCSNode? = null
+
+        private var prev : LBCSNode? = null
+
+        init {
+            addNeighbor()
+        }
+
+        fun addNeighbor() {
+            if (i < nodes - 1) {
+                next = LBCSNode(i + 1)
+                next?.prev = this
+            }
+        }
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            canvas.drawLBCSNode(i, state.scale, paint)
+            next?.draw(canvas, paint)
+        }
+
+        fun update(cb : (Int, Float) -> Unit) {
+            state.update {
+                cb(i, it)
+            }
+        }
+
+        fun startUpdating(cb : () -> Unit) {
+            state.startUpdating(cb)
+        }
+
+        fun getNext(dir : Int, cb : () -> Unit) : LBCSNode {
+            var curr : LBCSNode? = prev
+            if (dir == 1) {
+                curr = next
+            }
+            if (curr != null) {
+                return curr
+            }
+            cb()
+            return this 
+        }
+    }
 }
