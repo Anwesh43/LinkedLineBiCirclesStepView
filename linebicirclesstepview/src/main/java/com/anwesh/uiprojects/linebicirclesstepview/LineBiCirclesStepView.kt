@@ -233,4 +233,12 @@ class LineBiCirclesStepView(ctx : Context) : View(ctx) {
             }
         }
     }
+
+    companion object {
+        fun create(activity: Activity) : LineBiCirclesStepView {
+            val view : LineBiCirclesStepView = LineBiCirclesStepView(activity)
+            activity.setContentView(view)
+            return view 
+        }
+    }
 }
