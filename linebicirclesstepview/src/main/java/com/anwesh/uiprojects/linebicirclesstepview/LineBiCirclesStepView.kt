@@ -20,6 +20,7 @@ val sizeFactor : Float = 2.5f
 val scDiv : Double = 0.51
 val scGap : Float = 0.05f
 val color : Int = Color.parseColor("#F57F17")
+val rFactor : Float = 2f
 
 fun Int.getInverse() : Float = 1f / this
 
@@ -55,19 +56,18 @@ fun Canvas.drawLBCSNode(i : Int, scale : Float, paint : Paint) {
     val sc1 : Float = scale.divideScale(0, 2)
     val sc2 : Float = scale.divideScale(1, 2)
     setStrokeStyle(color, Math.min(w, h) / strokeFactor, paint)
-    val xGap = size / (circles / 2)
+    val xGap = ((2 * size) / rFactor) / (circles / 2)
     save()
     translate(gap * (i + 1), h/2)
     rotate(90f * sc2)
     drawLine(-size, 0f, size, 0f, paint)
-    for (j in 0..circles) {
-        val sf : Float = 1f - 2 * (j % 2)
+    for (j in 0..circles-1) {
+        val sf : Float = 1f - 2 * (j / (circles/2))
         val sc : Float = sc1.divideScale(j, circles)
         val sc01 : Float = sc.divideScale(0, 2)
         val sc02 : Float = sc.divideScale(1, 2)
         save()
-        scale(sf, sf)
-        translate(-size/2 + xGap  * j, -xGap/2 - size/12)
+        translate(-sf * ((size/ rFactor) - (xGap  * j)), -(xGap/2 + size/12) * sf)
         drawStrokedArcCircle(xGap/2, sc01,paint)
         drawFilledCircle(xGap/2, sc02, paint)
         restore()
@@ -96,7 +96,7 @@ class LineBiCirclesStepView(ctx : Context) : View(ctx) {
 
     data class State(var scale : Float = 0f, var prevScale : Float = 0f, var dir : Float = 0f) {
         fun update(cb : (Float) -> Unit) {
-            scale += scale.updateScale(dir, circles, 1)
+            scale += scale.updateScale(dir, circles * 2, 1)
             if (Math.abs(scale - prevScale) > 1) {
                 scale = prevScale + dir
                 dir = 0f
@@ -238,7 +238,7 @@ class LineBiCirclesStepView(ctx : Context) : View(ctx) {
         fun create(activity: Activity) : LineBiCirclesStepView {
             val view : LineBiCirclesStepView = LineBiCirclesStepView(activity)
             activity.setContentView(view)
-            return view 
+            return view
         }
     }
 }
